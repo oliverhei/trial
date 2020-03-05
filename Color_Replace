@@ -1,0 +1,28 @@
+Option Explicit
+
+Sub cReplace_Dialog(control As IRibbonControl)
+    RC_Form.Show False
+End Sub
+
+Sub cReplace(c1 As Long, c2 As Long)
+    Dim oSh As Shape
+    
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        Call ColorReplacement(oSh, c1, c2)
+    Next oSh
+End Sub
+
+Sub ColorReplacement(Shp As Shape, c1 As Long, c2 As Long)
+    Dim gSh As Shape
+    
+    On Error Resume Next
+    If Shp.Type = msoGroup Then
+        For Each gSh In Shp.GroupItems
+            Call ColorReplacement(gSh, c1, c2)
+        Next gSh
+    ElseIf Shp.HasTextFrame Then
+        If Shp.Fill.ForeColor.RGB = c1 Then
+            Shp.Fill.ForeColor.RGB = c2
+        End If
+    End If
+End Sub
