@@ -1,0 +1,185 @@
+'Master cannot use
+Sub Repaste_JPG(control As IRibbonControl)
+    Dim pn As Byte
+    Dim count As Byte
+    Dim l As Single
+    Dim t As Single
+    Dim h As Single
+    Dim oSh As ShapeRange
+    Dim RatioLock As Boolean
+    Dim rng As ShapeRange
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+    
+    pn = ActiveWindow.Selection.SlideRange.SlideIndex
+    If ActiveWindow.Selection.HasChildShapeRange Then
+        Set rng = ActiveWindow.Selection.ChildShapeRange
+    Else
+        Set rng = ActiveWindow.Selection.ShapeRange
+    End If
+    count = rng.count
+    For i = 1 To count
+        With rng(i)
+            RatioLock = .LockAspectRatio
+            .LockAspectRatio = True
+            l = .Left
+            t = .Top
+            h = .Height
+            .Height = h + 36
+            .Cut
+        End With
+        Set oSh = ActivePresentation.Slides(pn).Shapes.PasteSpecial(ppPasteJPG, False, , , , False)
+        With oSh
+            .LockAspectRatio = True
+            .Left = l
+            .Top = t
+            .Height = h
+            .LockAspectRatio = RatioLock
+        End With
+    Next i
+End Sub
+
+Sub Repaste_PNG(control As IRibbonControl)
+    Dim pn As Byte
+    Dim count As Byte
+    Dim l As Single
+    Dim t As Single
+    Dim h As Single
+    Dim oSh As ShapeRange
+    Dim RatioLock As Boolean
+    Dim rng As ShapeRange
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+    
+    pn = ActiveWindow.Selection.SlideRange.SlideIndex
+    If ActiveWindow.Selection.HasChildShapeRange Then
+        Set rng = ActiveWindow.Selection.ChildShapeRange
+    Else
+        Set rng = ActiveWindow.Selection.ShapeRange
+    End If
+    count = rng.count
+    For i = 1 To count
+        With rng(i)
+            RatioLock = .LockAspectRatio
+            .LockAspectRatio = True
+            l = .Left
+            t = .Top
+            h = .Height
+            .Height = h + 36
+            .Cut
+        End With
+        Set oSh = ActivePresentation.Slides(pn).Shapes.PasteSpecial(ppPastePNG, False, , , , False)
+        With oSh
+            .LockAspectRatio = True
+            .Left = l
+            .Top = t
+            .Height = h
+            .LockAspectRatio = RatioLock
+        End With
+    Next i
+End Sub
+
+Sub Resize2CorrectRatioH(control As IRibbonControl)
+    Dim cH As Single
+    Dim oH As Single
+    
+    Dim oSh As Shape
+    Dim rng As ShapeRange
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+    
+    If ActiveWindow.Selection.HasChildShapeRange Then
+        Set rng = ActiveWindow.Selection.ChildShapeRange
+    Else
+        Set rng = ActiveWindow.Selection.ShapeRange
+    End If
+    
+    On Error Resume Next
+    For Each oSh In rng
+        With oSh
+            .LockAspectRatio = False
+            
+            cH = .Height
+            .ScaleHeight 1, True
+            .ScaleWidth 1, True
+            
+            .LockAspectRatio = True
+            .Height = cH
+        End With
+    Next oSh
+    On Error GoTo 0
+End Sub
+
+Sub Resize2CorrectRatioW(control As IRibbonControl)
+    Dim cW As Single
+    Dim oW As Single
+    
+    Dim oSh As Shape
+    Dim rng As ShapeRange
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+    
+    If ActiveWindow.Selection.HasChildShapeRange Then
+        Set rng = ActiveWindow.Selection.ChildShapeRange
+    Else
+        Set rng = ActiveWindow.Selection.ShapeRange
+    End If
+    
+    On Error Resume Next
+    For Each oSh In rng
+        With oSh
+            .LockAspectRatio = False
+            
+            cW = .Width
+            .ScaleHeight 1, True
+            .ScaleWidth 1, True
+            
+            .LockAspectRatio = True
+            .Width = cW
+        End With
+    Next oSh
+    On Error GoTo 0
+End Sub
+
+Sub Photo2Dummy(control As IRibbonControl)
+    Dim oSh As Shape
+    Dim dummy As Shape
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+    
+    On Error GoTo Destroy
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        Set dummy = ActiveWindow.View.Slide.Shapes.AddShape(msoShapeRectangle, 1, 1, 1, 1)
+        With dummy
+            .LockAspectRatio = False
+            .TextFrame.AutoSize = ppAutoSizeNone
+            
+            .Fill.ForeColor.RGB = RGB(217, 217, 217)
+            .Line.Visible = False
+            
+            .Height = oSh.Height
+            .Width = oSh.Width
+            .Top = oSh.Top
+            .Left = oSh.Left
+        End With
+        oSh.Delete
+    Next oSh
+    
+Destroy:
+End Sub
+
