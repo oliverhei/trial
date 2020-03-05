@@ -1,0 +1,143 @@
+Sub UngroupTable(control As IRibbonControl)
+    Dim Tlb As Table
+    Dim oSld As Slide
+    Dim ColW, RowH, CellL, RecordL, CellT, CurrPage, i, j As Long
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+
+    If ActiveWindow.Selection.ShapeRange(1).HasTable = False Then
+        MsgBox "Please select a Table", vbExclamation
+        Exit Sub
+    End If
+    
+    CurrPage = ActiveWindow.Selection.SlideRange(1).SlideNumber
+    
+    With ActiveWindow.Selection.ShapeRange(1)
+        Set Tlb = .Table
+        With .Duplicate
+            .Align msoAlignCenters, True
+            .Align msoAlignMiddles, True
+            RecordL = .Left
+            CellT = .Top
+            .Delete
+        End With
+    End With
+    
+    'New Slide------------------------------------------------------
+    Set oSld = ActivePresentation.Slides.AddSlide(CurrPage + 1, ActiveWindow.Selection.SlideRange(1).CustomLayout)
+    ActiveWindow.View.GotoSlide CurrPage + 1
+    If oSld.Shapes.count > 0 Then
+        oSld.Shapes.Range.Delete
+    End If
+    '---------------------------------------------------------------
+    
+    With Tlb
+        For i = 1 To .Rows.count
+            CellL = RecordL
+            RowH = .Rows(i).Height
+            For j = 1 To .Columns.count
+                ColW = .Columns(j).Width
+                With oSld.Shapes.AddTextbox(msoTextOrientationHorizontal, CellL, CellT, ColW, RowH).TextFrame
+                    'Important
+                    .AutoSize = ppAutoSizeNone
+                    .WordWrap = True
+                    .TextRange.Text = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Text
+                    
+                    'Text
+                    Tlb.Cell(i, j).Shape.TextFrame.TextRange.Copy
+                    .TextRange.Paste
+                    
+                    'Font
+                    '.TextRange.Font.Size = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.Size
+                    '.TextRange.Font.name = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.name
+                    '.TextRange.Font.NameFarEast = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.NameFarEast
+                    '.TextRange.Font.Bold = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.Bold
+                    '.TextRange.Font.Italic = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.Italic
+                    '.TextRange.Font.Underline = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.Underline
+                    '.TextRange.Font.Color = Tlb.Cell(i, j).Shape.TextFrame.TextRange.Font.Color
+                    
+                    'Fill
+                    .Parent.Fill.ForeColor.RGB = Tlb.Cell(i, j).Shape.Fill.ForeColor.RGB
+                    
+                    'Margin
+                    .MarginTop = Tlb.Cell(i, j).Shape.TextFrame.MarginTop
+                    .MarginBottom = Tlb.Cell(i, j).Shape.TextFrame.MarginBottom
+                    .MarginLeft = Tlb.Cell(i, j).Shape.TextFrame.MarginLeft
+                    .MarginRight = Tlb.Cell(i, j).Shape.TextFrame.MarginRight
+                    
+                    'Alignment
+                    '.TextRange.ParagraphFormat.Alignment = Tlb.Cell(i, j).Shape.TextFrame.TextRange.ParagraphFormat.Alignment
+                    .VerticalAnchor = Tlb.Cell(i, j).Shape.TextFrame.VerticalAnchor
+                End With
+                CellL = CellL + ColW
+            Next j
+            CellT = CellT + RowH
+        Next i
+    End With
+End Sub
+
+Sub SetBorderANG(control As IRibbonControl)
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Nothing is selected", vbCritical
+        Exit Sub
+    End If
+    
+    If ActiveWindow.Selection.ShapeRange.count <> 1 Or ActiveWindow.Selection.ShapeRange(1).HasTable = False Then
+        MsgBox "Please select table cells", vbExclamation
+        Exit Sub
+    End If
+    
+    Dim Tlb As Table
+    Dim i As Integer
+    Dim j As Integer
+    Dim firstR As Boolean
+    Dim frOK As Boolean
+    
+    Set Tlb = ActiveWindow.Selection.ShapeRange(1).Table
+    firstR = True
+    frOK = False
+    
+    For i = 1 To Tlb.Rows.count
+        For j = 1 To Tlb.Columns.count
+            With Tlb.Cell(i, j)
+                If .Selected Then
+                    .Borders(ppBorderLeft).Transparency = 1
+                    .Borders(ppBorderRight).Transparency = 1
+                    .Borders(ppBorderDiagonalUp).Transparency = 1
+                    .Borders(ppBorderDiagonalDown).Transparency = 1
+                    
+                    .Borders(ppBorderTop).Visible = True
+                    .Borders(ppBorderBottom).Visible = True
+                    If firstR Then
+                        .Borders(ppBorderTop).Weight = 1
+                    Else
+                        .Borders(ppBorderTop).Weight = 0.5
+                    End If
+                    .Borders(ppBorderBottom).Weight = 0.5
+                    .Borders(ppBorderTop).ForeColor.ObjectThemeColor = msoThemeColorBackground2
+                    .Borders(ppBorderBottom).ForeColor.ObjectThemeColor = msoThemeColorBackground2
+                    .Borders(ppBorderTop).Style = msoLineSingle
+                    .Borders(ppBorderBottom).Style = msoLineSingle
+                    frOK = True
+                End If
+            End With
+        Next j
+        If frOK Then firstR = False
+    Next i
+    
+End Sub
+
+Sub SwitchRow(control As IRibbonControl)
+    'Duplcate table
+    'Copy rows from old to new
+    'Replace table
+    With ActiveWindow.Selection.ShapeRange(1).Table
+        .Rows(1).Select
+        ActiveWindow.Selection.Copy
+    End With
+End Sub
+    
