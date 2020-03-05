@@ -1,0 +1,168 @@
+Option Explicit
+
+Sub ConnectTopBottom(control As IRibbonControl)
+    'Variables----------------------------------------------
+    Dim PosY As Scripting.Dictionary
+    Set PosY = New Scripting.Dictionary
+    
+    Dim oSh As Shape
+    Dim SingleBox As Shape
+    Dim i As Integer
+    Dim OnTop As Single
+    Dim oSld As Slide
+    
+    OnTop = ActivePresentation.PageSetup.SlideHeight
+    '-------------------------------------------------------
+    
+    'Find Layers--------------------------------------------
+    On Error GoTo NothingSelected
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If Not PosY.Exists(oSh.Top) Then PosY.Add oSh.Top, 1
+        'find the most top
+        If oSh.Top < OnTop Then OnTop = oSh.Top
+    Next oSh
+    On Error GoTo 0
+    
+    ''Check if only 2 layers selected
+    If PosY.count <> 2 Then
+        MsgBox "Please select 2 layers.", vbExclamation, "Oops"
+        Exit Sub
+    End If
+    '-------------------------------------------------------
+    
+    'Check which layer has 1 box only-----------------------
+    i = 0
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If oSh.Top = PosY.Keys(0) Then i = i + 1
+        If i = 2 Then Exit For
+    Next oSh
+    
+    If i = 1 Then 'Keys(0) layer has 1 box only
+        i = 0
+    Else
+        i = 1     'Keys(1) layer has 1 box only
+    End If
+    
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If oSh.Top = PosY.Keys(i) Then
+            Set SingleBox = oSh
+            Exit For
+        End If
+    Next oSh
+    '-------------------------------------------------------
+    
+    'Connecting---------------------------------------------
+    Set oSld = ActiveWindow.View.Slide
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If oSh.Id <> SingleBox.Id Then
+            With oSld.Shapes.AddConnector(DetermineType(oSh, SingleBox), 0, 0, 3, 3)
+                If SingleBox.Top = OnTop Then
+                    .ConnectorFormat.BeginConnect SingleBox, 3
+                    .ConnectorFormat.EndConnect oSh, 1
+                Else
+                    .ConnectorFormat.BeginConnect oSh, 3
+                    .ConnectorFormat.EndConnect SingleBox, 1
+                End If
+                .Line.Weight = 0.5
+                .Line.ForeColor.ObjectThemeColor = msoThemeColorBackground2
+                If .Line.ForeColor.RGB <> RGB(169, 177, 176) Then
+                    .Line.ForeColor.RGB = RGB(169, 177, 176)
+                End If
+            End With
+        End If
+    Next oSh
+    '-------------------------------------------------------
+Exit Sub
+
+NothingSelected:
+    MsgBox "Please select 2 layers of shapes first!", vbInformation, "Heyhey"
+End Sub
+
+Sub ConnectLeftRight(control As IRibbonControl)
+    'Variables----------------------------------------------
+    Dim PosX As Scripting.Dictionary
+    Set PosX = New Scripting.Dictionary
+    
+    Dim oSh As Shape
+    Dim SingleBox As Shape
+    Dim i As Integer
+    Dim LHS As Single
+    Dim oSld As Slide
+    
+    LHS = ActivePresentation.PageSetup.SlideWidth
+    '-------------------------------------------------------
+    
+    'Find Layers--------------------------------------------
+    On Error GoTo NothingSelected
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If Not PosX.Exists(oSh.Left) Then PosX.Add oSh.Left, 1
+        'find the most left
+        If oSh.Left < LHS Then LHS = oSh.Left
+    Next oSh
+    On Error GoTo 0
+    
+    ''Check if only 2 layers selected
+    If PosX.count <> 2 Then
+        MsgBox "Please select 2 layers.", vbExclamation, "Oops"
+        Exit Sub
+    End If
+    '-------------------------------------------------------
+    
+    'Check which layer has 1 box only-----------------------
+    i = 0
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If oSh.Left = PosX.Keys(0) Then i = i + 1
+        If i = 2 Then Exit For
+    Next oSh
+    
+    If i = 1 Then 'Keys(0) layer has 1 box only
+        i = 0
+    Else
+        i = 1     'Keys(1) layer has 1 box only
+    End If
+    
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If oSh.Left = PosX.Keys(i) Then
+            Set SingleBox = oSh
+            Exit For
+        End If
+    Next oSh
+    '-------------------------------------------------------
+    
+    'Connecting---------------------------------------------
+    Set oSld = ActiveWindow.View.Slide
+    For Each oSh In ActiveWindow.Selection.ShapeRange
+        If oSh.Id <> SingleBox.Id Then
+            With oSld.Shapes.AddConnector(DetermineType(oSh, SingleBox), 0, 0, 3, 3)
+                If SingleBox.Left = LHS Then
+                    .ConnectorFormat.BeginConnect SingleBox, 4
+                    .ConnectorFormat.EndConnect oSh, 2
+                Else
+                    .ConnectorFormat.BeginConnect oSh, 4
+                    .ConnectorFormat.EndConnect SingleBox, 2
+                End If
+                .Line.Weight = 0.5
+                .Line.ForeColor.ObjectThemeColor = msoThemeColorBackground2
+                If .Line.ForeColor.RGB <> RGB(169, 177, 176) Then
+                    .Line.ForeColor.RGB = RGB(169, 177, 176)
+                End If
+            End With
+        End If
+    Next oSh
+    '-------------------------------------------------------
+Exit Sub
+
+NothingSelected:
+    MsgBox "Please select 2 layers of shapes first!", vbInformation, "Heyhey"
+End Sub
+
+Function DetermineType(Sh1 As Shape, Sh2 As Shape) As MsoConnectorType
+   DetermineType = msoConnectorElbow
+    If Round(Sh1.Left + Sh1.Width / 2, 4) = Round(Sh2.Left + Sh2.Width / 2, 4) Then
+        DetermineType = msoConnectorStraight
+    End If
+    If Round(Sh1.Top + Sh1.Height / 2, 4) = Round(Sh2.Top + Sh2.Height / 2, 4) Then
+        DetermineType = msoConnectorStraight
+    End If
+End Function
+
