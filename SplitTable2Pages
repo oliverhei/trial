@@ -1,0 +1,147 @@
+Option Explicit
+Sub getBTinfo(control As IRibbonControl)
+    
+    If ActiveWindow.Selection.Type = ppSelectionNone Then
+        MsgBox "Please select a table to be splited.", vbExclamation
+        Exit Sub
+    End If
+    
+    If ActiveWindow.Selection.ShapeRange.count = 1 Then
+        If ActiveWindow.Selection.ShapeRange(1).HasTable = True Then
+            BreakTableInfo.Show
+        Else
+            MsgBox "Please select a table to be splited.", vbExclamation
+        End If
+    Else
+        MsgBox "Please select one table only.", vbInformation
+    End If
+End Sub
+
+Sub BreakTable(HeaderR As Byte, h As Single)
+    Dim i As Integer
+    Dim j As Integer
+    'Dim FirstSlide As Slide
+    Dim DummySld As Slide
+    Dim oSld As Slide
+    
+    'Set FirstSlide = ActivePresentation.Slides(ActiveWindow.View.Slide.SlideIndex)
+    Set DummySld = ActivePresentation.Slides(ActiveWindow.View.Slide.SlideIndex)
+    Set oSld = ActivePresentation.Slides(ActiveWindow.View.Slide.SlideIndex)
+    
+    'Set the table into a variable & reocord parameters===============
+    Dim oMtb As Table
+    Dim oTb As Table
+    Dim OldName As String
+    Dim t As Single
+    Dim l As Single
+    
+    Set oTb = ActiveWindow.Selection.ShapeRange(1).Table
+    Set oMtb = oTb.Parent.Duplicate(1).Table
+    
+    oMtb.Parent.name = "OM_Master"
+    OldName = oTb.Parent.name
+    oTb.Parent.name = "Table_Seg"
+    
+    t = oTb.Parent.Top
+    l = oTb.Parent.Left
+    '=================================================================
+    
+    'Move table to grey area==========================================
+    oMtb.Parent.Left = ActivePresentation.PageSetup.SlideWidth + 50
+    oMtb.Parent.Top = 50
+    '=================================================================
+    
+    'Add Master Sign==================================================
+    With oSld.Shapes.AddShape(msoShapeRectangle, oMtb.Parent.Left + 1, oMtb.Parent.Top + 1, 186, 78)
+        .name = "Master_Sign"
+        .Height = 1.08 * 72
+        .Width = 2.58 * 72
+        .TextFrame.AutoSize = ppAutoSizeNone
+        .TextFrame.VerticalAnchor = msoAnchorMiddle
+        .TextFrame.TextRange.ParagraphFormat.Alignment = ppAlignCenter
+        .TextFrame.TextRange.Text = "Master"
+        With .TextFrame.TextRange.Font
+            .Size = 24
+            .name = "Arial"
+            .color.RGB = RGB(255, 0, 0)
+            .Bold = True
+            .Underline = False
+            .Italic = False
+        End With
+        .Line.Weight = 1.5
+        .Line.ForeColor.RGB = RGB(255, 0, 0)
+        .Fill.ForeColor.RGB = RGB(255, 255, 255)
+    End With
+    '=================================================================
+    
+    'Max Table height in point========================================
+    Dim MaxTBHeight As Single
+    MaxTBHeight = h * 72
+    '=================================================================
+    
+    'Duplicate Slides=================================================
+    Set DummySld = oSld.Duplicate(1)
+    DummySld.Shapes("OM_Master").Delete
+    DummySld.Shapes("Master_Sign").Delete
+    oSld.Select
+    '=================================================================
+    
+    'Header rows height===============================================
+    Dim HeaderH As Single
+    HeaderH = 0
+    
+    If HeaderR <> 0 Then
+        For i = 1 To HeaderR
+            HeaderH = HeaderH + oTb.Rows(i).Height
+        Next i
+    End If
+    '=================================================================
+    
+    'Start Break======================================================
+    Dim CumulatedH As Single
+    Dim ProgressR As Integer
+    Dim StopOp As Boolean
+    
+    ProgressR = HeaderR + 1
+    StopOp = False
+    
+    
+    Do
+        CumulatedH = 0
+        If ProgressR <> HeaderR + 1 Then
+            Set oSld = DummySld
+            Set DummySld = oSld.Duplicate(1)
+            oSld.Select
+            For j = ProgressR - 1 To HeaderR + 1 Step -1
+                oSld.Shapes("Table_Seg").Table.Rows(j).Delete
+            Next j
+        End If
+        With oSld.Shapes("Table_Seg").Table
+            For i = HeaderR + 1 To .Rows.count
+                If HeaderH + CumulatedH + .Rows(i).Height > MaxTBHeight Then
+                    If i = HeaderR + 1 Then
+                        MsgBox "One of the row/header exceeds the height, please check", vbCritical
+                        Exit Sub
+                    Else
+                        '---------------------------------------------
+                        'Split it (May try to revise without using for)
+                        For j = .Rows.count To i Step -1
+                            .Rows(j).Delete
+                        Next j
+                        '---------------------------------------------
+                        ProgressR = i - HeaderR - 1 + ProgressR
+                        Exit For
+                    End If
+                Else
+                    CumulatedH = CumulatedH + .Rows(i).Height
+                End If
+                
+                If i = .Rows.count Then StopOp = True
+            Next i
+            .Parent.name = OldName
+        End With
+    Loop Until StopOp = True
+    '=================================================================
+    
+    DummySld.Delete
+End Sub
