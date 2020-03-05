@@ -1,0 +1,95 @@
+Option Explicit
+
+Sub ChgFontController(control As IRibbonControl)
+    Dim ef As String
+    Dim cf As String
+    Dim iFileSave As Integer
+    
+    iFileSave = MsgBox("Press OK to save and continue.", vbInformation + vbOKCancel)
+    If iFileSave <> vbOK Then Exit Sub
+    ActivePresentation.Save
+    
+    If control.Id = "f1" Then
+        'Arial + MS JH
+        ef = "Arial"
+        cf = "Microsoft JhengHei"
+    ElseIf control.Id = "f2" Then
+        'Arial + KaiTi
+        ef = "Arial"
+        cf = "KaiTi"
+    ElseIf control.Id = "f3" Then
+        'Arial + STKaiti
+        ef = "Arial"
+        cf = "STKaiti"
+    ElseIf control.Id = "f4" Then
+        'Custom
+        ef = InputBox("Font for English", "Change Font")
+        If ClearSpace(ef) = "" Then Exit Sub
+        
+        cf = InputBox("Font for Chinese", "Change Font")
+        If ClearSpace(cf) = "" Then Exit Sub
+    ElseIf control.Id = "f5" Then
+        '+Body
+        Call FormatFont("+mn-lt", "+mn-ea")
+        Exit Sub
+    End If
+    
+    If fState = True Then
+        'Change theme font
+        With ActivePresentation.SlideMaster.Theme.ThemeFontScheme
+            .MajorFont(msoThemeLatin).name = ef
+            .MinorFont(msoThemeLatin).name = ef
+            .MajorFont(msoThemeEastAsian).name = cf
+            .MinorFont(msoThemeEastAsian).name = cf
+        End With
+        
+        'Format to +Body
+        Call FormatFont("+mn-lt", "+mn-ea")
+    Else
+        Call FormatFont(ef, cf)
+    End If
+End Sub
+
+Sub FormatFont(ENfont As String, CNfont As String)
+    Dim oSh As Shape
+    Dim oSld As Slide
+    Dim i, j As Integer
+    Dim iFileSave As Integer
+    
+    For Each oSld In ActivePresentation.Slides
+        oSld.Select
+        For Each oSh In oSld.Shapes
+            Call formatShape(oSh, ENfont, CNfont)
+        Next oSh
+    Next oSld
+    MsgBox "Please check once.", vbInformation
+End Sub
+
+Sub formatShape(Shp As Shape, ENfont As String, CNfont As String)
+    Dim gSh As Shape
+    Dim i, j As Integer
+    
+    On Error Resume Next
+    If Shp.Type = msoGroup Then
+        For Each gSh In Shp.GroupItems
+            Call formatShape(gSh, ENfont, CNfont)
+        Next gSh
+    ElseIf Shp.HasTextFrame Then
+        Shp.TextFrame.TextRange.Font.name = ENfont
+        Shp.TextFrame.TextRange.Font.NameFarEast = CNfont
+    ElseIf Shp.HasTable Then
+        For i = 1 To Shp.Table.Columns.count
+            For j = 1 To Shp.Table.Rows.count
+                Shp.Table.Cell(j, i).Shape.TextFrame.TextRange.Font.name = ENfont
+                Shp.Table.Cell(j, i).Shape.TextFrame.TextRange.Font.NameFarEast = CNfont
+            Next j
+        Next i
+    ElseIf Shp.HasChart Then
+        Shp.Chart.Format.TextFrame2.TextRange.Font.name = ENfont
+        Shp.Chart.Format.TextFrame2.TextRange.Font.NameFarEast = CNfont
+    End If
+End Sub
+
+Function ClearSpace(str As String)
+    ClearSpace = Replace(str, " ", "")
+End Function
