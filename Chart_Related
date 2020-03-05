@@ -1,0 +1,98 @@
+Sub CountHiddenSld(control As IRibbonControl)
+    Dim i As Integer
+    Dim oSld As Slide
+    
+    i = 0
+    For Each oSld In ActivePresentation.Slides
+        If oSld.SlideShowTransition.Hidden Then i = i + 1
+    Next oSld
+    MsgBox i, vbInformation
+End Sub
+
+Sub DummyBox(control As IRibbonControl)
+    Dim oSh As Shape
+    Dim Sld As Slide
+    
+    Set Sld = ActiveWindow.View.Slide
+    Set oSh = Sld.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 100)
+    
+    With oSh
+        .Fill.ForeColor.RGB = RGB(255, 255, 255)
+        .Fill.Transparency = 0
+        .Line.Weight = 1.5
+        .Line.ForeColor.RGB = RGB(255, 0, 0)
+        .TextFrame.TextRange.Font.color.RGB = RGB(255, 0, 0)
+        .TextFrame.TextRange.Font.name = "Arial"
+        .TextFrame.TextRange.Font.Size = 24
+        .TextFrame.TextRange.Font.Bold = True
+        .TextFrame.TextRange.Font.Italic = False
+        .TextFrame.TextRange.Font.Underline = False
+        .TextFrame.AutoSize = ppAutoSizeNone
+        .TextFrame.WordWrap = False
+        .TextFrame.VerticalAnchor = msoAnchorMiddle
+        .TextFrame.TextRange.ParagraphFormat.Alignment = ppAlignCenter
+        .Height = 0.9 * 72
+        .Width = 2.8 * 72
+        .TextFrame.TextRange.Text = "Dummy"
+        .Select
+    End With
+End Sub
+
+Sub VersionBox(control As IRibbonControl)
+    Dim oSh As Shape
+    Dim Sld As Slide
+    Dim i As Integer
+    
+    If ActiveWindow.Selection.SlideRange.count = 1 Then
+        Set Sld = ActiveWindow.View.Slide
+        Set oSh = Sld.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 100)
+        
+        With oSh
+            .Fill.ForeColor.RGB = RGB(255, 255, 255)
+            .Fill.Transparency = 0
+            .Line.Weight = 1.5
+            .Line.ForeColor.RGB = RGB(255, 0, 0)
+            .TextFrame.TextRange.Font.color.RGB = RGB(255, 0, 0)
+            .TextFrame.TextRange.Font.name = "Arial"
+            .TextFrame.TextRange.Font.Size = 24
+            .TextFrame.TextRange.Font.Bold = True
+            .TextFrame.TextRange.Font.Italic = False
+            .TextFrame.TextRange.Font.Underline = False
+            .TextFrame.AutoSize = ppAutoSizeNone
+            .TextFrame.WordWrap = False
+            .TextFrame.VerticalAnchor = msoAnchorMiddle
+            .TextFrame.TextRange.ParagraphFormat.Alignment = ppAlignCenter
+            .Height = 0.9 * 72
+            .Width = 2.8 * 72
+            .TextFrame.TextRange.Text = "Version  "
+            .Select
+            
+            .TextFrame.TextRange.Characters(9).Select
+        End With
+    Else
+        For i = 1 To ActiveWindow.Selection.SlideRange.count
+            Set Sld = ActiveWindow.Selection.SlideRange(i)
+            Set oSh = Sld.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 100)
+            
+            With oSh
+                .Fill.ForeColor.RGB = RGB(255, 255, 255)
+                .Fill.Transparency = 0
+                .Line.Weight = 1.5
+                .Line.ForeColor.RGB = RGB(255, 0, 0)
+                .TextFrame.TextRange.Font.color.RGB = RGB(255, 0, 0)
+                .TextFrame.TextRange.Font.name = "Arial"
+                .TextFrame.TextRange.Font.Size = 24
+                .TextFrame.TextRange.Font.Bold = True
+                .TextFrame.TextRange.Font.Italic = False
+                .TextFrame.TextRange.Font.Underline = False
+                .TextFrame.AutoSize = ppAutoSizeNone
+                .TextFrame.WordWrap = False
+                .TextFrame.VerticalAnchor = msoAnchorMiddle
+                .TextFrame.TextRange.ParagraphFormat.Alignment = ppAlignCenter
+                .Height = 0.9 * 72
+                .Width = 2.8 * 72
+                .TextFrame.TextRange.Text = "Version " & i
+            End With
+        Next i
+    End If
+End Sub
