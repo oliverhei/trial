@@ -1,0 +1,47 @@
+Option Explicit
+
+Sub Grouping_chg(control As IRibbonControl, state As Boolean)
+    gState = state
+End Sub
+
+Sub Align_chg(control As IRibbonControl, state As Boolean)
+    aState = control.Tag
+    On Error GoTo uAll
+    MyRibbon.InvalidateControl "ss2"
+    MyRibbon.InvalidateControl "ss3"
+    MyRibbon.InvalidateControl "ss4"
+    MyRibbon.InvalidateControl "ss5"
+    MyRibbon.InvalidateControl "ss6"
+    MyRibbon.InvalidateControl "ss7"
+    MyRibbon.InvalidateControl "ss8"
+    On Error GoTo 0
+Exit Sub
+
+uAll:
+    MyRibbon.Invalidate
+    
+End Sub
+
+Sub Reset_chg(control As IRibbonControl)
+    gState = False
+    aState = 0
+    
+    On Error GoTo uAll
+    MyRibbon.InvalidateControl "ss1"
+    MyRibbon.InvalidateControl "ss2"
+    MyRibbon.InvalidateControl "ss3"
+    MyRibbon.InvalidateControl "ss4"
+    MyRibbon.InvalidateControl "ss5"
+    MyRibbon.InvalidateControl "ss6"
+    MyRibbon.InvalidateControl "ss7"
+    MyRibbon.InvalidateControl "ss8"
+    On Error GoTo 0
+Exit Sub
+
+uAll:
+    MyRibbon.Invalidate
+End Sub
+
+Sub ThemeFont_chg(control As IRibbonControl, state As Boolean)
+    fState = state
+End Sub
