@@ -1,0 +1,115 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="Ribbon_OnLoad">
+	<ribbon>
+		<tabs>
+			<tab idMso="TabAddIns">
+				<group id="group1"  label="PPT Tools Collection by OM">
+					<menu id="chart" label="Chart" imageMso="ChartInsert" size="large" keytip="C">
+						<menuSeparator id="separatorC1" title="Chart Data"/>						
+						<button id="c1" label="&amp;X - Extract Data" imageMso="TableAutoFormat" onAction="RipChartValues" />
+						<button id="c2" label="&amp;N - Convert to Native" imageMso="N" onAction="bbChartToNative" />
+						
+						<menuSeparator id="separatorC2" title="Format Related"/>
+						<button id="c3" label="&amp;M - Add Markers to Lines" imageMso="ChartTypeLineInsertGallery" onAction="AddMarker" />
+						<button id="c4" label="Delete Markers" imageMso="DeclineTask" onAction="DelMarker" />
+						
+						<menuSeparator id="separatorC3" />
+						<button id="c5" label="&amp;S - Smooth the Lines" imageMso="ShapeCurve" onAction="SmoothLine" />
+						<button id="c6" label="Unsmooth the Lines" imageMso="DeclineTask" onAction="UnSmoothLine" />
+					</menu>
+					
+					<menu id="table" label="Table" imageMso="TableInsert" size="large" keytip="T">
+						<menuSeparator id="separatorT1" title="Table Border" />
+						<button id="t1" label="&amp;B - Format Selected Cell Border (ANG)" imageMso="BorderDrawLine" onAction="SetBorderANG" />
+						<menuSeparator id="separatorT2" title="Break Table" />
+						<button id="t2" label="&amp;U - Ungroup Table" imageMso="TaskSplit" onAction="UngroupTable" />
+						<button id="t3" label="&amp;S - Split Table into Pages (Maybe Time Consuming)" imageMso="MailMergeDocument" onAction="getBTinfo" />
+					</menu>
+					
+					<menu id="shape" label="Shape" imageMso="ShapesMoreShapes" size="large" keytip="S">
+						<menuSeparator id="separatorS1" title="Remove Empty"/>
+						<button id="s1" label="&amp;E - Delete Empty Box" imageMso="FrameDelete" onAction="Del_Empty" />
+						
+						<menuSeparator id="separatorS2" title="Resize Picture"/>						
+						<button id="s2" label="&amp;R - Resize to Fit Text" imageMso="SizeToControlHeightAndWidth" onAction="ResizeEach" />
+						<button id="s3" label="&amp;T - Resize to The Tallest" imageMso="SizeToControlHeight" onAction="Resize2Tallest" />
+						<button id="s4" label="&amp;W - Resize to The Widest" imageMso="SizeToControlWidth" onAction="Resize2Widest" />
+						<menuSeparator id="separatorS3"/>
+						<button id="s5" label="&amp;A - Resize to Average Height" imageMso="TableRowsDistribute" onAction="Resize2AverageHeight" />
+						<button id="s6" label="&amp;B - Resize to Average Width" imageMso="TableColumnsDistribute" onAction="Resize2AverageWidth" />
+						<menuSeparator id="separatorS4"/>
+						<menu id="s7" label="More &amp;Settings">
+							<menuSeparator id="separatorSS1" title="Grouping" />	
+							<toggleButton id="ss1" label="&amp;G - Group After Resizing" getPressed="GroupToggle" onAction="Grouping_chg" />
+							
+							<menuSeparator id="separatorSS2" title="Align Afterwards" />	
+							<toggleButton id="ss2" label="&amp;X - No Align" imageMso="Delete" tag="0" getPressed="AlignToggle" onAction="Align_chg" />
+
+							<menuSeparator id="separatorSS3" />	
+							<toggleButton id="ss3" label="&amp;T - Top Align" imageMso="ObjectsAlignTop" tag="1" getPressed="AlignToggle" onAction="Align_chg" />
+							<toggleButton id="ss4" label="&amp;M - Midddle Align" imageMso="ObjectsAlignMiddleVertical" tag="2" getPressed="AlignToggle" onAction="Align_chg" />
+							<toggleButton id="ss5" label="&amp;B - Bottom Align" imageMso="ObjectsAlignBottom" tag="3" getPressed="AlignToggle" onAction="Align_chg" />
+
+							<menuSeparator id="separatorSS4" />	
+							<toggleButton id="ss6" label="&amp;L - Left Align" imageMso="ObjectsAlignLeft" tag="4" getPressed="AlignToggle" onAction="Align_chg" />
+							<toggleButton id="ss7" label="&amp;C - Center Align" imageMso="ObjectsAlignCenterHorizontal" tag="5" getPressed="AlignToggle" onAction="Align_chg" />
+							<toggleButton id="ss8" label="&amp;R - Right Align" imageMso="ObjectsAlignRight" tag="6" getPressed="AlignToggle" onAction="Align_chg" />
+
+							<menuSeparator id="separatorSS5" title="Reset" />	
+							<button id="ss9" label="&amp;A - Reset All Settings" imageMso="DeclineTask" onAction="Reset_chg" />
+						</menu>
+						
+						<menuSeparator id="separatorS5" title="Connect Org Chart (2 layers only, 1 to n / n to 1)" />
+						<button id="s8" label="&amp;1 - Connect Top &amp;&amp; Bottom (Top Align Layer first)" imageMso="OrganizationChartLayoutStandard" onAction="ConnectTopBottom" />
+						<button id="s9" label="&amp;2 - Connect Left &amp;&amp; Right (Left Align Layer first)" imageMso="OrganizationOutlook" onAction="ConnectLeftRight" />
+						
+						<menuSeparator id="separatorS6" title="Re-coloring"/>
+						<button id="s10" label="&amp;D - Find and Replace Shape Color" imageMso="FontColorCycle" onAction="cReplace_Dialog" />
+						<menuSeparator id="separatorS7"/>
+						<button id="s11" label="&amp;L - Line Color follow Fill Color" imageMso="LineColorGallery" onAction="ColorLine2Fill" />
+						<button id="s12" label="&amp;F - Fill Color follow Line Color" imageMso="FillColorGallery" onAction="ColorFill2Line" />
+						<button id="s13" label="&amp;G - Old BB Grey to ANG Grey" imageMso="ColorSilver" onAction="ReGrey" />
+						
+						<menuSeparator id="separatorS8" title="Connect Shapes"/>
+						<button id="s14" label="&amp;C - Connect 2 Shapes from Center" imageMso="VisioStraightConnector" onAction="ConnectTwoCircle" />
+					</menu>
+					
+					<menu id="pic" label="Picture" imageMso="PictureInsertFromFile" size="large" keytip="P">
+						<menuSeparator id="separatorP1" title="Re-paste Picture"/>
+						<button id="p1" label="&amp;J - Repaste to JPG" imageMso="PictureInsertFromFile" onAction="Repaste_JPG" />
+						<button id="p2" label="&amp;P - Repaste to PNG" imageMso="ControlBoundObjectFrame" onAction="Repaste_PNG" />
+						
+						<menuSeparator id="separatorP2" title="Fix Picture Scale"/>
+						<button id="p3" label="&amp;H - Rescale by Expanding Height" imageMso="RowHeight" onAction="Resize2CorrectRatioW" />
+						<button id="p4" label="&amp;W - Rescale by Expanding Width" imageMso="ColumnWidth" onAction="Resize2CorrectRatioH" />
+						
+						<menuSeparator id="separatorP3 " title="Others" />
+						<button id="p5" label="&amp;D - Change to Dummy Box" imageMso="AppointmentColor4" onAction="Photo2Dummy" />
+					</menu>
+					
+					<menu id="font" label="Font" imageMso="AdpDiagramNewLabel" size="large" keytip="F">
+						<menuSeparator id="separatorF1" title="Change Whole Deck Font"/>
+						<toggleButton id="fs1" label="&amp;T - By Changing Theme Font" getPressed="ThemeFontToggle" onAction="ThemeFont_chg" />
+						
+						<menuSeparator id="separatorF2" />
+						<button id="f1" label="&amp;1 - Arial &amp;&amp; MS JhengHei" imageMso="_1" onAction="ChgFontController" />
+						<button id="f2" label="&amp;2 - Arial &amp;&amp; KaiTi" imageMso="_2" onAction="ChgFontController" />
+						<button id="f3" label="&amp;3 - Arial &amp;&amp; STKaiti" imageMso="_3" onAction="ChgFontController" />
+						<button id="f4" label="&amp;4 - Custom Font" imageMso="_4" onAction="ChgFontController" />
+						
+						<menuSeparator id="separatorF3" />
+						<button id="f5" label="&amp;5 - +Body &amp;&amp; +Body Asian" imageMso="_5" onAction="ChgFontController" />
+					</menu>
+					
+					<menu id="misc" label="Misc" imageMso="AdpDiagramIndexesKeys" size="large" keytip="M">
+						<button id="m1" label="&amp;H - Count Hiddn Slides" imageMso="BlackAndWhiteDontShow" onAction="CountHiddenSld" />
+						
+						<menuSeparator id="separatorM1" />
+						<button id="m2" label="&amp;D - Add Dummy Box" imageMso="D" onAction="DummyBox" />
+						<button id="m3" label="&amp;V - Add Version Box" imageMso="V" onAction="VersionBox" />
+					</menu>
+					
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
+</customUI>
