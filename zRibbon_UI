@@ -1,0 +1,30 @@
+Option Explicit
+
+Public MyRibbon As IRibbonUI
+Public gState As Boolean
+Public aState As Byte
+Public fState As Boolean
+
+Sub Ribbon_OnLoad(ribbon As IRibbonUI)
+    Set MyRibbon = ribbon
+    gState = False
+    aState = 0
+    fState = False
+End Sub
+
+Sub GroupToggle(control As IRibbonControl, returnedVal)
+    returnedVal = gState
+End Sub
+
+Sub AlignToggle(control As IRibbonControl, returnedVal)
+    If aState = control.Tag Then
+        returnedVal = True
+    Else
+        returnedVal = False
+    End If
+End Sub
+
+Sub ThemeFontToggle(control As IRibbonControl, returnedVal)
+    returnedVal = fState
+End Sub
+
